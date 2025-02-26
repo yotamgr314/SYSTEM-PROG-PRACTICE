@@ -8,8 +8,11 @@ typedef struct {
     // שדות נוספים כפי הצורך
 } Singleton;
 
+pthread_mutex_t singleton_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 // הפונקציה שמחזירה את האובייקט הסינגלטון
 Singleton* get_singleton() {
+    pthread_mutex_lock(&singleton_mutex);
     static Singleton* instance = NULL; // משתנה סטטי לשמירת המופע
     if (instance == NULL) 
     {
@@ -22,6 +25,7 @@ Singleton* get_singleton() {
         instance->value = 0;
     }
     return instance;
+    pthread_mutex_unlock(&singleton_mutex);
 }
 
 int main() {
@@ -32,3 +36,4 @@ int main() {
     }
     return 0;
 }
+-
