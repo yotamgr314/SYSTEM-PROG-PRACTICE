@@ -24,8 +24,14 @@ pthread_cond_t  queue_cond  = PTHREAD_COND_INITIALIZER;
 // Semaphore to limit concurrent printer calls to 3.
 sem_t printer_sem;
 
-// Global shutdown flag (useful for later extensions, e.g., SIGHUP handling)
-volatile sig_atomic_t shutdown_flag = 0;
+
+void init_sync_primitives(void) {
+    // Initialize the printer semaphore for threads (pshared = 0) with initial count 3.
+    if (sem_init(&printer_sem, 0, 3) != 0) {
+        perror("sem_init");
+        exit(EXIT_FAILURE);
+    }
+}
 
 
 // CONFIRMED BY ERANNNNNNNNNNNN
@@ -34,8 +40,10 @@ void enqueue_message(char *message) {
     pthread_mutex_lock(&queue_mutex);
     queue_push(message);
     // Signal all waiting threads that a new message is available.
-    pthread_cond_broadcast(&queue_cond); // ERAN SAID TO PUT IT OUTSIDE THE LOCK ! NOT SUCH A BIG MISTAKE BUT NO REASON IT SHALL BE LOCKED.
-    pthread_mutex_unlock(&queue_mutex); 
+
+    pthread_mutex_unlock(&queue_mutex); // ERAN SAID TO PUT IT OUTSIDE THE LOCK ! NOT SUCH A BIG MISTAKE BUT NO REASON IT SHALL BE LOCKED.
+    pthread_cond_broadcast(&queue_cond); 
+
 }
 // CONFIRMED BY ERANNNNNNNNNNNN
 
@@ -43,7 +51,7 @@ void enqueue_message(char *message) {
 
 
 
-// Consumer function: waits until a message is available in the queue,
+/* // Consumer function: waits until a message is available in the queue,
 // pops the message, and sends it to the printer.
 // It limits concurrent printer calls using a semaphore.
 void *consumer_function(void *arg) {
@@ -85,7 +93,7 @@ void *consumer_function(void *arg) {
     }
     return NULL;
 }
-
+ */
 
 
 
