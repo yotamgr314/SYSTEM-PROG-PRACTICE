@@ -32,6 +32,7 @@ void handle_sigchld(int sig) {
             {
                 close(pipe_fd[0]); // Close the read end of the pipe
 
+                // open file for reading.
                 FILE *file = fopen(FILENAME, "r");
                 if (!file) {
                     perror("fopen");
@@ -41,10 +42,13 @@ void handle_sigchld(int sig) {
                 char line[MAX_LINE];
                 int current_line = 0;
                 
-                while (fgets(line, MAX_LINE, file)) {
-                    if (current_line >= start_line) {
+                // read line by line from file
+                while (fgets(line, MAX_LINE, file)) 
+                {
+                    if (current_line >= start_line) 
+                    {
+                        // write the line read to the pipe.
                         write(pipe_fd[1], line, strlen(line) + 1);
-                        sleep(1); // Simulate processing delay
                     }
                     current_line++;
                 }
@@ -57,8 +61,10 @@ void handle_sigchld(int sig) {
     }
 }
 
-int main() {
-    if (pipe(pipe_fd) == -1) {
+int main() 
+{
+    if (pipe(pipe_fd) == -1)
+    {
         perror("pipe");
         exit(1);
     }
@@ -83,7 +89,7 @@ if (child_pid == 0) // child process
     char line[MAX_LINE];
     int current_line = 0;
 
-    while (fgets(line, MAX_LINE, file)) 
+    while (fgets(line, MAX_LINE, file))  // read line in size of 100 bytes
     {
         if (current_line >= start_line)
         {
