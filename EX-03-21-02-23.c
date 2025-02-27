@@ -91,7 +91,7 @@ if (child_pid == 0) // child process
 
     while (fgets(line, MAX_LINE, file))  // read line in size of 100 bytes
     {
-        if (current_line >= start_line)
+        if (current_line >= start_line) // only write to the father via the pipe the lines which he
         {
             write(pipe_fd[1], line, strlen(line) + 1);
             sleep(1);
